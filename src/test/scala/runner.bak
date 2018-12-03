@@ -1,0 +1,13 @@
+object runner {
+  def main(args: Array[String]): Unit = {
+    assert(args.length == 2)
+    val runDate: String = args(0)
+    val diffDates: Int = args(1).asInstanceOf[Int]
+
+    val startDate: String = DateUtil.getDiffDate(Some(runDate), Some(diffDates))
+
+    DailyETLJob.etlJobRunner(runDate)
+
+    CCOAlgorithm.ccoAlgoRnner(startDate, runDate)
+  }
+}
