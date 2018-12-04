@@ -190,6 +190,18 @@ CREATE TABLE `rec_item_event_corr_nc` (
 `product_id`  bigint(15) UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品id' ,
 `cat_path`  varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '商品类目路径' ,
 `price`  float(10,4) UNSIGNED ZEROFILL NULL DEFAULT 00000.0000 COMMENT '商品价格' ,
+`pop_order`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '下单pop分' ,
+`pop_cart`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '加购pop分' ,
+`pop_wish`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '收藏pop分' ,
+`pop_click`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '点击pop分' ,
+`trend_order`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '下单trend分' ,
+`trend_cart`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '加购trend分' ,
+`trend_wish`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '收藏trend分' ,
+`trend_click`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '点击trend分' ,
+`hot_order`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '下单hot分' ,
+`hot_cart`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '加购hot分' ,
+`hot_wish`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '收藏hot分' ,
+`hot_click`  float(7,2) NOT NULL DEFAULT 0.00 COMMENT '点击hot分' ,
 `popular_score`  float(10,5) UNSIGNED ZEROFILL NULL DEFAULT 0000.00000 COMMENT 'popular分数' ,
 `hot_score`  float(10,5) UNSIGNED ZEROFILL NULL DEFAULT 0000.00000 COMMENT 'hot分数' ,
 `trend_score`  float(10,5) UNSIGNED ZEROFILL NULL DEFAULT 0000.00000 COMMENT 'trend分数' ,
@@ -199,15 +211,16 @@ CREATE TABLE `rec_item_event_corr_nc` (
 `click_corr_payload`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '点击关联商品及分数' ,
 `text_corr_payload`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '文本关联商品及分数' ,
 `update_time`  varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '插入时间' ,
-PRIMARY KEY (`id`),
+PRIMARY KEY (`id`, `update_time`),
 INDEX `pt_ix` (`product_id`) USING BTREE COMMENT '商品id索引',
 INDEX `time_ix` (`update_time`) USING BTREE COMMENT '时间索引'
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='商品协同分数'
-AUTO_INCREMENT=1
+AUTO_INCREMENT=127134
 ROW_FORMAT=DYNAMIC
 ;
+
 
 

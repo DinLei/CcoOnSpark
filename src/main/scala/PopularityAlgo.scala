@@ -9,8 +9,10 @@ object PopularityAlgo {
   private val spark = SparkUtils.getSparkSession("calcPop")
 
   def main(args: Array[String]): Unit = {
+    val endDate: Option[String] = Some(args(0))
+
     val eventNames = ModelParams.eventNames
-    val interval = DateUtil.getTimeInterval()
+    val interval = DateUtil.getTimeInterval(offsetDate = endDate)
     val popEventsMap = calcPopular(eventNames, interval)
     val trendingEventsMap = calcTrending(eventNames, interval)
     val hotEventsMap = calcHot(eventNames, interval)
