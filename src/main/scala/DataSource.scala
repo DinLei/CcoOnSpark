@@ -93,10 +93,12 @@ object DataSource {
       row => {
         val productId: ProductID = row.get(0).toString
         val text: Array[String] = row.get(1).toString.toLowerCase.split(" ")
-        val category: String = row.get(2).toString
-        (productId, category, text)
+        val catPath: String = row.get(2).toString
+        val catList: Array[String] = catPath.split("-")
+        val cat4cat: String = if (catList.length >= 2) catList(1) else catList(0)
+        (productId, catPath, cat4cat, text)
       }
-    ).toDF("product_id", "category", "text")
+    ).toDF("product_id", "cat_path", "cat4cat", "text")
   }
 }
 

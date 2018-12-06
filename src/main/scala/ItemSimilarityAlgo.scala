@@ -21,17 +21,17 @@ object ItemSimilarityAlgo {
   }
 
   def calcSimilarity(
-                      t2vRddByCat: List[(String, RDD[(String, DenseVector)])],
-                      neighborNum: Option[Int]=None): List[(String, RDD[(String, String)])] = {
+                      t2vRddByCat: List[(String, RDD[(String, String, DenseVector)])],
+                      neighborNum: Option[Int]=None): List[(String, RDD[(String, String, String)])] = {
     t2vRddByCat.map {
-      case (category, t2vRdd) =>
+      case (cat4cat, t2vRdd) =>
         val bT2vRdd = spark.sparkContext.broadcast(t2vRdd.collect())
         val itemSim = t2vRdd.map {
-          case (pId1, t2v1) =>
+          case (pId1, catPath, t2v1) =>
             val t2v1BDV = new BDV(t2v1.values)
             val t2vs = bT2vRdd.value.filter(_._1 != pId1)
             val neighbors = t2vs.map {
-              case (pId2, t2v2) =>
+              case (pId2, _, t2v2) =>
                 val t2v2BDV = new BDV(t2v2.values)
                 val cosSim = t2v2BDV.dot(t2v1BDV) / (norm(t2v2BDV) * norm(t2v1BDV))
                 (pId2, cosSim)
@@ -39,15 +39,15 @@ object ItemSimilarityAlgo {
             val simPayloads = neighbors.map {
               case (pId2, simScore) => pId2 + "|" + simScore.formatted("%.5f")
             }
-            pId1 -> simPayloads.mkString(" ")
+            (pId1, catPath, simPayloads.mkString(" "))
         }
-        category -> itemSim
+        cat4cat -> itemSim
     }
   }
 
   def getText2VecRdd(
                       w2vDim: Option[Int]=None,
-                      minCount: Option[Int]=None): List[(String, RDD[(String, DenseVector)])] = {
+                      minCount: Option[Int]=None): List[(String, RDD[(String, String, DenseVector)])] = {
     val itemDescData: DataFrame = DataSource.readingItemDesc()
 
     val word2Vec = new Word2Vec()
@@ -60,42 +60,41 @@ object ItemSimilarityAlgo {
 
     import spark.implicits._
     val t2vRdd = model.transform(itemDescData).select(
-      "product_id", "category", "text_vec"
+      "product_id", "cat_path", "cat4cat", "text_vec"
     ).map(
       row => {
-        val category = row.get(1).toString
+        val catPath = row.get(1).toString
+        val cat4cat = row.get(2).toString
         val productID = row.get(0).toString
-        val textVec = row.get(2).asInstanceOf[DenseVector]
-        category -> (productID, textVec)
+        val textVec = row.get(3).asInstanceOf[DenseVector]
+        cat4cat -> (productID, catPath, textVec)
       }).rdd
 
-    val allCategories = t2vRdd.map {
-      case (category, _) => category
+    val allCat4cat = t2vRdd.map {
+      case (cat4cat, _) => cat4cat
     }.distinct().collect().toList
 
-    allCategories.map {
-      category =>
+    allCat4cat.map {
+      cat4cat =>
         val singleT2vRdd = t2vRdd.filter {
-          record => category.equals(record._1)
+          record => cat4cat.equals(record._1)
         }.map {
-          record => (record._2._1, record._2._2)
+          record => (record._2._1, record._2._2, record._2._3)
         }
-        (category, singleT2vRdd)
+        (cat4cat, singleT2vRdd)
     }
   }
 
-  def saveItemSimilarity(itemSim: List[(String, RDD[(String, String)])]): Boolean = {
+  def saveItemSimilarity(itemSim: List[(String, RDD[(String, String, String)])]): Boolean = {
     val itemSimHead = itemSim.head
     var similarityDF: DataFrame = spark.createDataFrame(
       itemSimHead._2)
-      .toDF("product_id", "sim_payload")
-      .withColumn("category", lit(itemSimHead._1))
+      .toDF("product_id", "cat_path" , "text_corr_payload")
 
     itemSim.tail.foreach {
       case (category, singleRdd) =>
         val tmpDF = spark.createDataFrame(singleRdd)
-          .toDF("product_id", "sim_payload")
-          .withColumn("category", lit(category))
+          .toDF("product_id", "cat_path" , "text_corr_payload")
         similarityDF = similarityDF.union(tmpDF)
     }
 

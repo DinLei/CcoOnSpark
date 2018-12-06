@@ -9,9 +9,9 @@ ON pd.products_id = ptc.products_id
 
 -- 商品相似表
 create table if not exists ai.nc_item_similarity (
-    product_id      string,
-    sim_payload     string,
-    category        string
+    product_id            string,
+    cat_path              string,
+    text_corr_payload     string
 );
 
 -- 商品热度表
