@@ -114,7 +114,7 @@ and orders_status not in (1,4,6,12,17,20,21,22,23,27)
 and products_id != 0
 and r_position rlike '.*(buytogether-auto|youMayAlsoLike|home_recommend|category|categories|hot_product).*'
 
--- 综合表
+-- 数据源
 create table if not exists ai.nc_customer_daily_events (
     sess_id       bigint,
     user_id       bigint,
@@ -124,7 +124,7 @@ create table if not exists ai.nc_customer_daily_events (
 ) partitioned by (event_time string)
 row format delimited fields terminated by ',';
 
--- 得分表
+-- 最终写入
 create table if not exists ai.nc_item_event_corr (
     product_id       string,
     corr_payload     string

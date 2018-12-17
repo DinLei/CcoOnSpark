@@ -95,7 +95,7 @@ object CCOAlgorithm {
     spark.createDataFrame(lastOutput).toDF(
       "product_id", "corr_payload", "event"
     ).write.mode("Overwrite").format("hive"
-    ).insertInto("ai.nc_item_event_corr")
+    ).insertInto(ModelParams.table2save)
     true
   }
 }

@@ -3,6 +3,8 @@ import helpers.EventID
 object ModelParams {
   val eventNames: List[EventID] = List("order", "cart", "wish", "click")
 
+  val table2save: String = "ai.nc_item_event_corr"
+
   val indicatorParamsList = Some(
     List(
       IndicatorParams(

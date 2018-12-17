@@ -96,9 +96,9 @@ object DateUtil {
 }
 
 case class itemEventCorr(
-                          val productID: ProductID,
-                          val payloadCorrScore: String,
-                          val eventName: EventID
+                          productID: ProductID,
+                          payloadCorrScore: String,
+                          eventName: EventID
                         ) extends Serializable
 
 
